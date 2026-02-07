@@ -1,35 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gmail Status Checker</title>
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; background-color: #f0f2f5; }
-        .container { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 480px; }
-        h2 { text-align: center; color: #333; }
-        #dbStatus { text-align: center; font-size: 13px; margin-bottom: 15px; font-weight: bold; padding: 5px; border-radius: 4px; }
-        textarea { width: 100%; height: 150px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; padding: 12px; box-sizing: border-box; font-size: 15px; }
-        button { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; }
-        button:disabled { background-color: #ccc; }
-        #results { margin-top: 20px; width: 100%; }
-        .email-box { padding: 12px; margin-bottom: 8px; border-radius: 6px; background: #fff; border: 1px solid #ddd; font-size: 16px; }
-        /* Bad status par Red color */
-        .is-bad { background-color: #ff4d4d !important; color: white; border-color: #cc0000; font-weight: bold; }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <h2>Report Chaker</h2>
-    <div id="dbStatus" style="background: #fff3cd; color: #856404;">Connecting to Database...</div>
-    
-    <textarea id="userInput" placeholder="Yahan Gmails paste karein..."></textarea>
-    <button id="checkBtn" onclick="processData()" disabled>Wait...</button>
-    
-    <div id="results"></div>
-</div>
-
 <script>
     let database = {};
     const sheetId = "1SWHJb85848h4u4obBkSbd3z5-jGLY---GIlFSR2yJ4w";
@@ -38,30 +6,36 @@
     async function loadData() {
         const statusDiv = document.getElementById('dbStatus');
         const btn = document.getElementById('checkBtn');
+        
+        // Professional loading text
+        statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Initializing Secure Connection...';
+        
         try {
             const response = await fetch(sheetCsvUrl);
             if (!response.ok) throw new Error();
             const text = await response.text();
             
-            // CSV lines ko process karna
             const lines = text.split("\n");
             database = {}; 
             lines.forEach(line => {
                 const cols = line.split(",");
                 if(cols.length >= 2) {
-                    let email = cols[0].trim().toLowerCase();
-                    let status = cols[1].trim().toLowerCase();
+                    let email = cols[1].trim().toLowerCase(); // Aapke table ke mutabiq Number ya Email Column B mein hy
+                    let status = cols[7].trim().toLowerCase(); // Status Column H mein hy
                     database[email] = status;
                 }
             });
             
-            statusDiv.innerText = "Connected to Server ✅";
-            statusDiv.style.background = "#d4edda";
+            // Professional "Connected" Status
+            statusDiv.innerHTML = '<i class="fas fa-shield-check"></i> SYSTEM ONLINE | SECURED';
+            statusDiv.style.background = "linear-gradient(135deg, #d4edda, #c3e6cb)";
             statusDiv.style.color = "#155724";
+            statusDiv.style.border = "1px solid #c3e6cb";
+            
             btn.disabled = false;
-            btn.innerText = "Check Emails";
+            btn.innerText = "Verify Report Now";
         } catch (e) {
-            statusDiv.innerText = "Error: Sheet must be 'Anyone with the link'";
+            statusDiv.innerText = "SYSTEM OFFLINE: Link Access Required";
             statusDiv.style.background = "#f8d7da";
             statusDiv.style.color = "#721c24";
         }
@@ -76,19 +50,28 @@
         
         const emails = input.split('\n').map(e => e.trim().toLowerCase()).filter(e => e !== "");
 
-        emails.forEach(email => {
-            const div = document.createElement('div');
-            div.className = 'email-box';
-            div.innerText = email;
+        let matchFound = false;
 
-            // Agar database mein email ke samne 'bad' likha hai
-            if (database[email] === "bad") {
-                div.classList.add('is-bad');
+        emails.forEach(email => {
+            // New Filter Logic: Sirf database mein majood emails dikhaye ga
+            if (database.hasOwnProperty(email)) {
+                matchFound = true;
+                const div = document.createElement('div');
+                div.className = 'email-box';
+                div.innerText = email;
+
+                if (database[email] === "bad" || database[email] === "blocked") {
+                    div.classList.add('is-bad');
+                    div.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${email} - BLACKLISTED`;
+                } else {
+                    div.innerHTML = `<i class="fas fa-check-circle"></i> ${email} - VERIFIED`;
+                }
+                resultsDiv.appendChild(div);
             }
-            resultsDiv.appendChild(div);
         });
+
+        if (!matchFound && emails.length > 0) {
+            resultsDiv.innerHTML = "<div style='text-align:center; color:#64748b; padding:20px;'>No records found in database.</div>";
+        }
     }
 </script>
-
-</body>
-</html>
