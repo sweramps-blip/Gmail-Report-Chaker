@@ -24,7 +24,6 @@
     <button onclick="processData()">Check Now</button>
     <div id="results"></div>
 </div>
-
 <script>
     let database = {};
     const sheetId = "1SWHJb85848h4u4obBkSbd3z5-jGLY---GIlFSR2yJ4w";
@@ -33,10 +32,6 @@
     async function loadData() {
         const statusDiv = document.getElementById('dbStatus');
         const btn = document.getElementById('checkBtn');
-        
-        // Professional loading text
-        statusDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Initializing Secure Connection...';
-        
         try {
             const response = await fetch(sheetCsvUrl);
             if (!response.ok) throw new Error();
@@ -47,22 +42,20 @@
             lines.forEach(line => {
                 const cols = line.split(",");
                 if(cols.length >= 2) {
-                    let email = cols[1].trim().toLowerCase(); // Aapke table ke mutabiq Number ya Email Column B mein hy
-                    let status = cols[7].trim().toLowerCase(); // Status Column H mein hy
+                    let email = cols[0].trim().toLowerCase();
+                    let status = cols[1].trim().toLowerCase();
                     database[email] = status;
                 }
             });
             
-            // Professional "Connected" Status
-            statusDiv.innerHTML = '<i class="fas fa-shield-check"></i> SYSTEM ONLINE | SECURED';
-            statusDiv.style.background = "linear-gradient(135deg, #d4edda, #c3e6cb)";
+            // Professional Status Text
+            statusDiv.innerText = "Connected to Server ✅";
+            statusDiv.style.background = "#d4edda";
             statusDiv.style.color = "#155724";
-            statusDiv.style.border = "1px solid #c3e6cb";
-            
             btn.disabled = false;
-            btn.innerText = "Verify Report Now";
+            btn.innerText = "Check Emails";
         } catch (e) {
-            statusDiv.innerText = "SYSTEM OFFLINE: Link Access Required";
+            statusDiv.innerText = "Error: Connection Failed ❌";
             statusDiv.style.background = "#f8d7da";
             statusDiv.style.color = "#721c24";
         }
@@ -77,32 +70,23 @@
         
         const emails = input.split('\n').map(e => e.trim().toLowerCase()).filter(e => e !== "");
 
-        let matchFound = false;
-
         emails.forEach(email => {
-            // New Filter Logic: Sirf database mein majood emails dikhaye ga
+            // Check: Agar email database mein hai tabhi agay barho
             if (database.hasOwnProperty(email)) {
-                matchFound = true;
                 const div = document.createElement('div');
                 div.className = 'email-box';
                 div.innerText = email;
 
-                if (database[email] === "bad" || database[email] === "blocked") {
+                // Status check
+                if (database[email] === "bad") {
                     div.classList.add('is-bad');
-                    div.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${email} - BLACKLISTED`;
-                } else {
-                    div.innerHTML = `<i class="fas fa-check-circle"></i> ${email} - VERIFIED`;
                 }
                 resultsDiv.appendChild(div);
             }
+            // Agar email database mein nahi hai, to ye loop kuch nahi karega (Hide ho jayegi)
         });
-
-        if (!matchFound && emails.length > 0) {
-            resultsDiv.innerHTML = "<div style='text-align:center; color:#64748b; padding:20px;'>No records found in database.</div>";
-        }
     }
 </script>
-
+</script>
 </body>
 </html>
-
