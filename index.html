@@ -48,7 +48,6 @@
                 }
             });
             
-            // Professional Status Text
             statusDiv.innerText = "Connected to Server ✅";
             statusDiv.style.background = "#d4edda";
             statusDiv.style.color = "#155724";
@@ -70,23 +69,45 @@
         
         const emails = input.split('\n').map(e => e.trim().toLowerCase()).filter(e => e !== "");
 
+        // Counting variables
+        let goodCount = 0;
+        let badCount = 0;
+
         emails.forEach(email => {
-            // Check: Agar email database mein hai tabhi agay barho
             if (database.hasOwnProperty(email)) {
                 const div = document.createElement('div');
                 div.className = 'email-box';
                 div.innerText = email;
 
-                // Status check
                 if (database[email] === "bad") {
                     div.classList.add('is-bad');
+                    badCount++; // Bad count barhayein
+                } else {
+                    goodCount++; // Good count barhayein
                 }
                 resultsDiv.appendChild(div);
             }
-            // Agar email database mein nahi hai, to ye loop kuch nahi karega (Hide ho jayegi)
         });
+
+        // Summary box dikhane ke liye
+        if (goodCount > 0 || badCount > 0) {
+            const summaryDiv = document.createElement('div');
+            summaryDiv.style.marginTop = "15px";
+            summaryDiv.style.padding = "10px";
+            summaryDiv.style.borderRadius = "8px";
+            summaryDiv.style.background = "#e9ecef";
+            summaryDiv.style.textAlign = "center";
+            summaryDiv.style.fontWeight = "bold";
+            
+            summaryDiv.innerHTML = `
+                <span style="color: #28a745;">Good: ${goodCount}</span> | 
+                <span style="color: #dc3545;">Bad: ${badCount}</span> | 
+                <span style="color: #333;">Total: ${goodCount + badCount}</span>
+            `;
+            resultsDiv.prepend(summaryDiv); // Counting ko results ke shuru mein dikhaye ga
+        }
     }
 </script>
-</script>
+
 </body>
 </html>
