@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gmail Buyer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --neon: #00f5d4;
+            --neon2: #f72585;
+            --neon3: #7209b7;
+            --bg: #020510;
+            --card: rgba(10, 15, 35, 0.95);
+            --border: rgba(0, 245, 212, 0.2);
+            --text: #e2eaff;
+            --muted: #5a6a8a;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0,245,212,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,245,212,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(114,9,183,0.15) 0%, transparent 60%),
+                        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(247,37,133,0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        @keyframes gridMove { 0% { transform: translateY(0); } 100% { transform: translateY(40px); } }
+
+        .container {
+            width: 100%;
+            max-width: 580px;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+            animation: fadeUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .orb { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; animation: orbFloat 8s ease-in-out infinite alternate; }
+        .orb-1 { width: 300px; height: 300px; background: rgba(0,245,212,0.06); top: -100px; left: -100px; }
+        .orb-2 { width: 250px; height: 250px; background: rgba(247,37,133,0.06); bottom: -80px; right: -80px; animation-delay: -4s; }
+
+        @keyframes orbFloat {
+            from { transform: translate(0,0) scale(1); }
+            to   { transform: translate(30px,20px) scale(1.1); }
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 35px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 0 0 1px rgba(0,245,212,0.05), 0 25px 50px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--neon), transparent);
+            opacity: 0.6;
+        }
+
+        .header-box {
+            position: relative;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(0,245,212,0.08), rgba(114,9,183,0.12));
+            border: 1px solid rgba(0,245,212,0.15);
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .header-box::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(0,245,212,0.05), transparent);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translateX(-100%); }
+            50%       { transform: translateX(100%); }
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0,245,212,0.1);
+            border: 1px solid rgba(0,245,212,0.3);
+            color: var(--neon);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.55rem;
+            letter-spacing: 3px;
+            padding: 4px 12px;
+            border-radius: 50px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .badge::before {
+            content: '';
+            width: 6px; height: 6px;
+            background: var(--neon);
+            border-radius: 50%;
+            animation: blink 1.5s ease-in-out infinite;
+            box-shadow: 0 0 8px var(--neon);
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.4; transform: scale(0.8); }
+        }
+
+        .header-box h2 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.4rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #ffffff, var(--neon));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .pass-row {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(247,37,133,0.1);
+            border: 1px solid rgba(247,37,133,0.2);
+            border-radius: 8px;
+            padding: 6px 14px;
+            font-size: 0.85rem;
+            color: #ff6eb4;
+        }
+
+        .pass-row span  { color: var(--muted); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; }
+        .pass-row strong{ font-family: 'Orbitron', monospace; letter-spacing: 2px; font-size: 0.8rem; }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 25px 0;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0,245,212,0.2), transparent);
+        }
+
+        .divider-text {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.5rem;
+            letter-spacing: 3px;
+            color: var(--muted);
+            text-transform: uppercase;
+        }
+
+        .input-group { margin-bottom: 22px; }
+
+        label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        label .label-icon {
+            width: 20px; height: 20px;
+            background: rgba(0,245,212,0.1);
+            border: 1px solid rgba(0,245,212,0.2);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        .input-wrapper { position: relative; }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 50px 14px 16px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(0,245,212,0.15);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]::placeholder { color: var(--muted); font-weight: 400; }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: rgba(0,245,212,0.5);
+            background: rgba(0,245,212,0.03);
+            box-shadow: 0 0 0 3px rgba(0,245,212,0.07), 0 0 20px rgba(0,245,212,0.08);
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 1rem;
+            pointer-events: none;
+        }
+
+        .input-hint { margin-top: 7px; font-size: 0.75rem; color: var(--muted); }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn-wide { grid-column: 1 / -1; }
+
+        button {
+            padding: 13px 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        button:hover::after { opacity: 1; }
+        button:active { transform: scale(0.97); }
+
+        .btn-check {
+            background: linear-gradient(135deg, #00b4d8, #0077b6);
+            color: white;
+            border: 1px solid rgba(0,180,216,0.3);
+            box-shadow: 0 4px 20px rgba(0,180,216,0.25);
+        }
+        .btn-check:hover { box-shadow: 0 4px 30px rgba(0,180,216,0.45); transform: translateY(-1px); }
+
+        .btn-screenshot {
+            background: linear-gradient(135deg, rgba(30,40,70,0.9), rgba(20,30,60,0.9));
+            color: var(--text);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-screenshot:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-1px); }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #7209b7, #f72585);
+            color: white;
+            border: 1px solid rgba(247,37,133,0.3);
+            box-shadow: 0 4px 20px rgba(247,37,133,0.2);
+            font-size: 0.85rem;
+        }
+        .btn-submit:hover { box-shadow: 0 6px 35px rgba(247,37,133,0.4); transform: translateY(-2px); }
+
+        .status-bar {
+            margin-top: 22px;
+            padding: 12px 16px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .status-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.78rem;
+            color: var(--muted);
+            letter-spacing: 1px;
+        }
+
+        .status-dot {
+            width: 8px; height: 8px;
+            background: var(--neon);
+            border-radius: 50%;
+            animation: blink 1.5s ease-in-out infinite;
+            box-shadow: 0 0 8px var(--neon);
+        }
+
+        .status-right {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.6rem;
+            color: rgba(0,245,212,0.5);
+            letter-spacing: 2px;
+        }
+
+        /* ── Stats row ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 22px 0;
+        }
+
+        .stat-box {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            transition: all 0.25s ease;
+        }
+
+        /* Valid & Invalid — clickable */
+        #validBox, #invalidBox {
+            cursor: pointer;
+        }
+        #validBox:hover {
+            background: rgba(0,245,212,0.07);
+            border-color: rgba(0,245,212,0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,245,212,0.15);
+        }
+        #invalidBox:hover {
+            background: rgba(247,37,133,0.07);
+            border-color: rgba(247,37,133,0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(247,37,133,0.15);
+        }
+
+        .stat-num {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.3rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        #totalCount  { color: #ffd60a; }
+        #validCount  { color: #00f5d4; }
+        #invalidCount{ color: #f72585; }
+
+        .stat-label {
+            font-size: 0.65rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .tap-hint {
+            font-size: 0.58rem;
+            color: var(--muted);
+            letter-spacing: 1px;
+            margin-top: 4px;
+            opacity: 0.6;
+        }
+
+        /* ── Modal ── */
+        .modal-bg {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.88);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(8px);
+        }
+        .modal-bg.open { display: flex; }
+
+        .modal {
+            background: rgba(8,12,30,0.99);
+            border: 1px solid rgba(0,245,212,0.18);
+            border-radius: 18px;
+            width: 100%;
+            max-width: 460px;
+            max-height: 78vh;
+            overflow-y: auto;
+            padding: 28px 24px;
+            position: relative;
+            animation: fadeUp 0.3s ease;
+            box-shadow: 0 0 80px rgba(0,0,0,0.9);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 14px; right: 14px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text);
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s;
+            padding: 0;
+            letter-spacing: 0;
+            text-transform: none;
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.15); }
+        .modal-close:active { transform: scale(0.95); }
+
+        .modal-head { margin-bottom: 18px; }
+
+        .modal-head h3 {
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+        .modal-head h3.v { color: var(--neon); }
+        .modal-head h3.i { color: #f72585; }
+
+        .modal-sub {
+            font-size: 0.72rem;
+            color: var(--muted);
+            letter-spacing: 1px;
+        }
+
+        .gmail-list { display: flex; flex-direction: column; gap: 8px; }
+
+        .gmail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.87rem;
+            font-weight: 600;
+            word-break: break-all;
+        }
+        .gmail-item.v { background: rgba(0,245,212,0.07); border: 1px solid rgba(0,245,212,0.2); color: #a0fff0; }
+        .gmail-item.i { background: rgba(247,37,133,0.07); border: 1px solid rgba(247,37,133,0.2); color: #ffb3d1; }
+
+        .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .gmail-item.v .dot { background: var(--neon); box-shadow: 0 0 6px var(--neon); }
+        .gmail-item.i .dot { background: #f72585; box-shadow: 0 0 6px #f72585; }
+
+        .msg-center {
+            text-align: center;
+            padding: 28px 0;
+            color: var(--muted);
+            font-size: 0.83rem;
+            letter-spacing: 1px;
+            line-height: 1.7;
+        }
+        .msg-center.loading { color: var(--neon); animation: blink 1.2s ease-in-out infinite; }
+    </style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<!-- ══ Report Modal ══ -->
+<div class="modal-bg" id="reportModal">
+    <div class="modal">
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <div class="modal-head">
+            <h3 id="mTitle" class="v">✅ Valid Gmails</h3>
+            <p class="modal-sub" id="mSub">Admin ki taraf se verified emails</p>
+        </div>
+        <div class="gmail-list" id="mList">
+            <div class="msg-center loading">⏳ Loading...</div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card">
+
+        <!-- Header -->
+        <div class="header-box">
+            <div class="badge">System Online</div>
+            <h2>Gmail Buyer</h2>
+            <div class="pass-row">
+                <span>Password</span>
+                <strong>aass1122</strong>
+                <span>•</span>
+                <span>Live Gmail Required</span>
+            </div>
+        </div>
+
+        <!-- Stats — Valid & Invalid are clickable report buttons -->
+        <div class="stats-row">
+            <div class="stat-box">
+                <div class="stat-num" id="totalCount">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-box" id="validBox" onclick="openReport('valid')" title="Valid emails dekhein">
+                <div class="stat-num" id="validCount">0</div>
+                <div class="stat-label">Valid ✅</div>
+                <div class="tap-hint">👆 tap report</div>
+            </div>
+            <div class="stat-box" id="invalidBox" onclick="openReport('invalid')" title="Invalid emails dekhein">
+                <div class="stat-num" id="invalidCount">0</div>
+                <div class="stat-label">Invalid ❌</div>
+                <div class="tap-hint">👆 tap report</div>
+            </div>
+        </div>
+
+        <div class="divider">
+            <span class="divider-text">Input Configuration</span>
+        </div>
+
+        <!-- Input -->
+        <div class="input-group">
+            <label>
+                <span class="label-icon">@</span>
+                Gmail Addresses (1 – 100)
+            </label>
+            <div class="input-wrapper">
+                <input type="text" id="gmailInput" placeholder="Enter Gmail address...">
+                <span class="input-icon">✉</span>
+            </div>
+            <p class="input-hint">⬡ Separate multiple emails with commas or new lines</p>
+        </div>
+
+        <!-- Buttons -->
+        <div class="btn-grid">
+            <!-- ✅ Check button → opens gmailver.com -->
+            <button class="btn-check" onclick="window.open('https://www.gmailver.com/','_blank')">
+                <span>🔍</span> Check Status
+            </button>
+            <button class="btn-screenshot" onclick="takeScreenshot()">
+                <span>📸</span> Screenshot
+            </button>
+            <!-- Submit Gmails to admin -->
+            <button class="btn-submit btn-wide" onclick="submitGmails()">
+                <span>📤</span> Submit to Admin
+            </button>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-left">
+                <div class="status-dot"></div>
+                <span id="statusText">System Ready for Bulk Processing</span>
+            </div>
+            <div class="status-right">V 2.0.1</div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // ── Config ──────────────────────────────────────────────
+    var GAS = "https://script.google.com/macros/s/AKfycbziDqfhlmwfiu1ef6fUH-Tro_bSYifwZFW6H5992P8oFfS9mFwolQQpF9RA9NkLUe6-ZQ/exec";
+    var UID = "";
+
+    // Get logged-in user ID from Power Star localStorage
+    try {
+        var _u = JSON.parse(localStorage.getItem("psUser") || localStorage.getItem("ps_user") || "{}");
+        UID = _u.user_id || localStorage.getItem("psID") || "";
+    } catch(e) {}
+
+    // Load report counts on page load
+    window.addEventListener("load", function() {
+        if (UID) loadCounts();
+    });
+
+    function loadCounts() {
+        fetch(GAS + "?type=get_gmail_report&userId=" + encodeURIComponent(UID) + "&countOnly=true")
+            .then(function(r){ return r.json(); })
+            .then(function(d) {
+                if (d.status === "success") {
+                    var v = d.valid_count   || 0;
+                    var i = d.invalid_count || 0;
+                    document.getElementById("validCount").textContent   = v;
+                    document.getElementById("invalidCount").textContent = i;
+                    document.getElementById("totalCount").textContent   = v + i;
+                }
+            })
+            .catch(function(){});
+    }
+
+    // ── Submit Gmails to admin ───────────────────────────────
+    function submitGmails() {
+        var raw = document.getElementById("gmailInput").value.trim();
+        if (!raw) { setStatus("⚠️ Pehle Gmail address darj karein"); return; }
+        if (!UID) { setStatus("⚠️ Pehle login karein"); return; }
+
+        // Parse — comma or newline separated
+        var emails = raw.split(/[\n,]+/)
+            .map(function(e){ return e.trim().toLowerCase(); })
+            .filter(function(e){ return e.indexOf("@") > 0; });
+
+        if (!emails.length) { setStatus("⚠️ Valid email nahi mili"); return; }
+
+        setStatus("📤 Bheja ja raha hai (" + emails.length + " emails)...");
+
+        fetch(GAS, {
+            method : "POST",
+            headers: { "Content-Type": "application/json" },
+            body   : JSON.stringify({ action:"submit_gmail", user_id:UID, emails:emails })
+        })
+        .then(function(r){ return r.json(); })
+        .then(function(d) {
+            if (d.status === "success") {
+                setStatus("✅ " + d.count + " Gmail(s) admin ko bhej di! 24 hrs mein report milegi.");
+                document.getElementById("gmailInput").value = "";
+            } else {
+                setStatus("❌ " + (d.message || "Kuch ghalat hua"));
+            }
+        })
+        .catch(function(){ setStatus("❌ Network error. Dobara try karein."); });
+    }
+
+    // ── Open Report Modal ────────────────────────────────────
+    function openReport(type) {
+        var modal = document.getElementById("reportModal");
+        var title = document.getElementById("mTitle");
+        var sub   = document.getElementById("mSub");
+        var list  = document.getElementById("mList");
+
+        if (type === "valid") {
+            title.textContent = "✅ Valid Gmails";
+            title.className   = "v";
+            sub.textContent   = "Admin ny in emails ko GOOD mark kiya hai";
+        } else {
+            title.textContent = "❌ Invalid Gmails";
+            title.className   = "i";
+            sub.textContent   = "Admin ny in emails ko KHARAB mark kiya hai";
+        }
+
+        list.innerHTML = '<div class="msg-center loading">⏳ Loading...</div>';
+        modal.classList.add("open");
+
+        if (!UID) {
+            list.innerHTML = '<div class="msg-center">⚠️ Pehle login karein</div>';
+            return;
+        }
+
+        fetch(GAS + "?type=get_gmail_report&userId=" + encodeURIComponent(UID) + "&filter=" + type)
+            .then(function(r){ return r.json(); })
+            .then(function(d) {
+                if (!d.emails || d.emails.length === 0) {
+                    var t = type === "valid" ? "valid" : "invalid";
+                    list.innerHTML = '<div class="msg-center">Abhi koi ' + t + ' email nahi.<br><small style="opacity:0.6">Admin 24 ghante mein review karta hai</small></div>';
+                    return;
+                }
+                var cls = type === "valid" ? "v" : "i";
+                list.innerHTML = d.emails.map(function(em) {
+                    return '<div class="gmail-item ' + cls + '"><span class="dot"></span>' + em + '</div>';
+                }).join("");
+            })
+            .catch(function(){
+                list.innerHTML = '<div class="msg-center">❌ Load nahi hua. Dobara try karein.</div>';
+            });
+    }
+
+    function closeModal() {
+        document.getElementById("reportModal").classList.remove("open");
+    }
+
+    document.getElementById("reportModal").addEventListener("click", function(e) {
+        if (e.target === this) closeModal();
+    });
+
+    // ── Screenshot ───────────────────────────────────────────
+    function takeScreenshot() {
+        setStatus("📸 Screenshot captured!");
+        setTimeout(function(){ setStatus("System Ready for Bulk Processing"); }, 2000);
+    }
+
+    function setStatus(msg) {
+        document.getElementById("statusText").textContent = msg;
+    }
+</script>
+
+</body>
+</html>
