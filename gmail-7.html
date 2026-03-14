@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gmail Buyer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --neon: #00f5d4;
+            --neon2: #f72585;
+            --bg: #020510;
+            --card: rgba(10,15,35,0.97);
+            --border: rgba(0,245,212,0.2);
+            --text: #e2eaff;
+            --muted: #5a6a8a;
+            --gold: #ffd60a;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px 0 40px;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background-image:
+                linear-gradient(rgba(0,245,212,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,245,212,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: fixed; inset: 0;
+            background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(114,9,183,0.15) 0%, transparent 60%),
+                        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(247,37,133,0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        @keyframes gridMove { 0%{transform:translateY(0)} 100%{transform:translateY(40px)} }
+
+        .container {
+            width: 100%; max-width: 560px;
+            padding: 0 16px;
+            position: relative; z-index: 10;
+            animation: fadeUp 0.7s ease forwards;
+        }
+
+        @keyframes fadeUp {
+            from { opacity:0; transform:translateY(24px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
+        .orb { position:fixed; border-radius:50%; filter:blur(80px); pointer-events:none; animation:orbFloat 8s ease-in-out infinite alternate; }
+        .orb-1 { width:280px;height:280px; background:rgba(0,245,212,0.06); top:-80px;left:-80px; }
+        .orb-2 { width:240px;height:240px; background:rgba(247,37,133,0.06); bottom:-60px;right:-60px; animation-delay:-4s; }
+        @keyframes orbFloat { from{transform:translate(0,0) scale(1)} to{transform:translate(25px,18px) scale(1.08)} }
+
+        .card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 28px 24px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 0 0 1px rgba(0,245,212,0.04), 0 24px 50px rgba(0,0,0,0.65);
+            position: relative; overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .card::before {
+            content:'';
+            position:absolute; top:0;left:0;right:0; height:1px;
+            background:linear-gradient(90deg,transparent,var(--neon),transparent);
+            opacity:0.5;
+        }
+
+        /* ── Header ── */
+        .header-box {
+            text-align: center;
+            padding: 22px 16px;
+            border-radius: 14px;
+            background: linear-gradient(135deg,rgba(0,245,212,0.07),rgba(114,9,183,0.12));
+            border: 1px solid rgba(0,245,212,0.14);
+            margin-bottom: 22px;
+            position: relative; overflow: hidden;
+        }
+
+        .header-box::before {
+            content:'';
+            position:absolute;inset:0;
+            background:linear-gradient(90deg,transparent,rgba(0,245,212,0.05),transparent);
+            animation:shimmer 3s ease-in-out infinite;
+        }
+        @keyframes shimmer { 0%,100%{transform:translateX(-100%)} 50%{transform:translateX(100%)} }
+
+        .badge {
+            display:inline-flex;align-items:center;gap:6px;
+            background:rgba(0,245,212,0.1);border:1px solid rgba(0,245,212,0.3);
+            color:var(--neon);font-family:'Orbitron',monospace;font-size:0.5rem;
+            letter-spacing:3px;padding:4px 12px;border-radius:50px;
+            text-transform:uppercase;margin-bottom:10px;
+        }
+        .badge::before {
+            content:'';width:6px;height:6px;background:var(--neon);border-radius:50%;
+            animation:blink 1.5s ease-in-out infinite;box-shadow:0 0 8px var(--neon);
+        }
+        @keyframes blink { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.7)} }
+
+        .header-box h2 {
+            font-family:'Orbitron',monospace;font-size:1.5rem;font-weight:900;letter-spacing:2px;
+            background:linear-gradient(135deg,#fff,var(--neon));
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+            margin-bottom:6px;
+        }
+
+        .tagline {
+            font-size:0.78rem;color:var(--gold);letter-spacing:1.5px;
+            font-weight:700;text-transform:uppercase;margin-bottom:14px;
+        }
+
+        /* ── Instructions box ── */
+        .instructions {
+            background: rgba(0,0,0,0.35);
+            border: 1px solid rgba(0,245,212,0.12);
+            border-radius: 10px;
+            padding: 14px 16px;
+            text-align: left;
+            margin-bottom: 14px;
+        }
+
+        .inst-title {
+            font-family:'Orbitron',monospace;font-size:0.6rem;
+            letter-spacing:2px;color:var(--neon);text-transform:uppercase;
+            margin-bottom:10px;display:flex;align-items:center;gap:6px;
+        }
+
+        .inst-list {
+            list-style:none;display:flex;flex-direction:column;gap:6px;
+        }
+
+        .inst-list li {
+            font-size:0.8rem;color:#c8d8f0;letter-spacing:0.3px;
+            display:flex;align-items:flex-start;gap:8px;line-height:1.4;
+        }
+
+        .inst-list li .step {
+            background:rgba(0,245,212,0.15);border:1px solid rgba(0,245,212,0.3);
+            color:var(--neon);font-family:'Orbitron',monospace;font-size:0.55rem;
+            font-weight:700;min-width:20px;height:20px;border-radius:50%;
+            display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;
+        }
+
+        /* ── Pass row ── */
+        .pass-row {
+            display:flex;align-items:center;justify-content:center;
+            flex-wrap:wrap;gap:8px;
+            background:rgba(247,37,133,0.08);border:1px solid rgba(247,37,133,0.2);
+            border-radius:8px;padding:8px 14px;
+        }
+
+        .pass-row .label { color:var(--muted);font-size:0.72rem;letter-spacing:1px;text-transform:uppercase; }
+        .pass-row .value { font-family:'Orbitron',monospace;letter-spacing:2px;font-size:0.85rem;color:#ff6eb4; }
+        .pass-row .sep   { color:var(--muted);font-size:0.7rem; }
+
+        /* ── Rate box ── */
+        .rate-box {
+            display:grid;grid-template-columns:1fr 1fr;gap:10px;
+            margin-bottom:20px;
+        }
+
+        .rate-item {
+            background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.06);
+            border-radius:10px;padding:12px;text-align:center;
+        }
+
+        .rate-item:first-child { border-color:rgba(0,245,212,0.2); }
+        .rate-item:last-child  { border-color:rgba(255,214,10,0.2); }
+
+        .rate-num {
+            font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:700;margin-bottom:3px;
+        }
+
+        .rate-item:first-child .rate-num { color:var(--neon); }
+        .rate-item:last-child  .rate-num { color:var(--gold); }
+
+        .rate-lbl { font-size:0.62rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted); }
+
+        /* ── Stats ── */
+        .stats-row {
+            display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;
+        }
+
+        .stat-box {
+            background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.05);
+            border-radius:10px;padding:12px;text-align:center;transition:all 0.25s;
+        }
+
+        #validBox, #invalidBox { cursor:pointer; }
+        #validBox:hover   { background:rgba(0,245,212,0.07);border-color:rgba(0,245,212,0.4);transform:translateY(-2px); }
+        #invalidBox:hover { background:rgba(247,37,133,0.07);border-color:rgba(247,37,133,0.4);transform:translateY(-2px); }
+
+        .stat-num { font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:700;line-height:1;margin-bottom:4px; }
+        #totalCount   { color:var(--gold); }
+        #validCount   { color:var(--neon); }
+        #invalidCount { color:#f72585; }
+
+        .stat-label { font-size:0.62rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted); }
+        .tap-hint   { font-size:0.58rem;color:var(--muted);margin-top:3px;opacity:0.6; }
+
+        /* ── Divider ── */
+        .divider {
+            display:flex;align-items:center;gap:10px;margin:20px 0;
+        }
+        .divider::before,.divider::after {
+            content:'';flex:1;height:1px;
+            background:linear-gradient(90deg,transparent,rgba(0,245,212,0.2),transparent);
+        }
+        .divider-text { font-family:'Orbitron',monospace;font-size:0.48rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase; }
+
+        /* ── Input / Textarea ── */
+        .input-group { margin-bottom:18px; }
+
+        label {
+            display:flex;align-items:center;gap:8px;margin-bottom:8px;
+            font-weight:700;font-size:0.78rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);
+        }
+        label .lbl-icon {
+            width:20px;height:20px;background:rgba(0,245,212,0.1);border:1px solid rgba(0,245,212,0.2);
+            border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;
+        }
+
+        textarea {
+            width:100%;padding:12px 14px;resize:none;
+            background:rgba(0,0,0,0.4);border:1px solid rgba(0,245,212,0.15);
+            border-radius:10px;color:var(--text);font-family:'Rajdhani',sans-serif;
+            font-size:0.95rem;font-weight:600;line-height:1.6;transition:all 0.3s;
+        }
+        textarea::placeholder { color:var(--muted);font-weight:400; }
+        textarea:focus {
+            outline:none;border-color:rgba(0,245,212,0.5);background:rgba(0,245,212,0.03);
+            box-shadow:0 0 0 3px rgba(0,245,212,0.07);
+        }
+
+        .input-hint { margin-top:6px;font-size:0.72rem;color:var(--muted); }
+
+        /* ── Buttons ── */
+        .btn-grid { display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px; }
+        .btn-wide { grid-column:1/-1; }
+
+        button {
+            padding:13px 14px;border:none;border-radius:10px;cursor:pointer;
+            font-family:'Rajdhani',sans-serif;font-weight:700;font-size:0.88rem;
+            letter-spacing:1.5px;text-transform:uppercase;transition:all 0.3s;
+            display:flex;align-items:center;justify-content:center;gap:8px;
+            position:relative;overflow:hidden;
+        }
+        button::after { content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.1),transparent);opacity:0;transition:opacity 0.3s; }
+        button:hover::after { opacity:1; }
+        button:active { transform:scale(0.97); }
+
+        .btn-check {
+            background:linear-gradient(135deg,#00b4d8,#0077b6);color:#fff;
+            border:1px solid rgba(0,180,216,0.3);box-shadow:0 4px 20px rgba(0,180,216,0.25);
+        }
+        .btn-check:hover { box-shadow:0 4px 30px rgba(0,180,216,0.45);transform:translateY(-1px); }
+
+        .btn-screenshot {
+            background:linear-gradient(135deg,rgba(114,9,183,0.8),rgba(30,40,70,0.9));color:var(--text);
+            border:1px solid rgba(114,9,183,0.3);
+        }
+        .btn-screenshot:hover { border-color:rgba(114,9,183,0.6);transform:translateY(-1px); }
+
+        .btn-submit {
+            background:linear-gradient(135deg,#7209b7,#f72585);color:#fff;
+            border:1px solid rgba(247,37,133,0.3);box-shadow:0 4px 20px rgba(247,37,133,0.2);
+        }
+        .btn-submit:hover { box-shadow:0 6px 35px rgba(247,37,133,0.4);transform:translateY(-2px); }
+
+        /* ── Status bar ── */
+        .status-bar {
+            margin-top:18px;padding:11px 14px;
+            background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.05);
+            border-radius:10px;display:flex;align-items:center;justify-content:space-between;
+        }
+        .status-left { display:flex;align-items:center;gap:8px;font-size:0.76rem;color:var(--muted);letter-spacing:1px; }
+        .status-dot  { width:8px;height:8px;background:var(--neon);border-radius:50%;animation:blink 1.5s ease-in-out infinite;box-shadow:0 0 8px var(--neon); }
+        .status-right { font-family:'Orbitron',monospace;font-size:0.58rem;color:rgba(0,245,212,0.5);letter-spacing:2px; }
+
+        /* ── Upload progress ── */
+        .upload-progress {
+            display:none;height:4px;background:rgba(255,255,255,0.05);
+            border-radius:2px;margin-top:10px;overflow:hidden;
+        }
+        .upload-progress.show { display:block; }
+        .upload-bar {
+            height:100%;background:linear-gradient(90deg,var(--neon),#7209b7);
+            border-radius:2px;width:0%;transition:width 0.3s;
+            animation:progShimmer 1.5s ease-in-out infinite;
+        }
+        @keyframes progShimmer { 0%,100%{opacity:1} 50%{opacity:0.6} }
+
+        /* ── Modal ── */
+        .modal-bg {
+            display:none;position:fixed;inset:0;
+            background:rgba(0,0,0,0.88);z-index:999;
+            align-items:center;justify-content:center;padding:20px;
+            backdrop-filter:blur(8px);
+        }
+        .modal-bg.open { display:flex; }
+
+        .modal {
+            background:rgba(8,12,30,0.99);border:1px solid rgba(0,245,212,0.18);
+            border-radius:18px;width:100%;max-width:460px;max-height:78vh;
+            overflow-y:auto;padding:26px 22px;position:relative;
+            animation:fadeUp 0.3s ease;box-shadow:0 0 80px rgba(0,0,0,0.9);
+        }
+
+        .modal-close {
+            position:absolute;top:14px;right:14px;
+            background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);
+            color:var(--text);width:30px;height:30px;border-radius:50%;cursor:pointer;
+            font-size:0.85rem;display:flex;align-items:center;justify-content:center;
+            transition:background 0.2s;padding:0;letter-spacing:0;text-transform:none;
+        }
+        .modal-close:hover { background:rgba(255,255,255,0.15); }
+
+        .modal-head { margin-bottom:16px; }
+        .modal-head h3 { font-family:'Orbitron',monospace;font-size:0.95rem;letter-spacing:2px;margin-bottom:4px; }
+        .modal-head h3.v { color:var(--neon); }
+        .modal-head h3.i { color:#f72585; }
+        .modal-sub { font-size:0.7rem;color:var(--muted);letter-spacing:1px; }
+
+        .gmail-list { display:flex;flex-direction:column;gap:7px; }
+
+        .gmail-item {
+            display:flex;align-items:center;gap:10px;padding:9px 12px;
+            border-radius:8px;font-size:0.85rem;font-weight:600;word-break:break-all;
+        }
+        .gmail-item.v { background:rgba(0,245,212,0.07);border:1px solid rgba(0,245,212,0.2);color:#a0fff0; }
+        .gmail-item.i { background:rgba(247,37,133,0.07);border:1px solid rgba(247,37,133,0.2);color:#ffb3d1; }
+
+        .dot { width:7px;height:7px;border-radius:50%;flex-shrink:0; }
+        .gmail-item.v .dot { background:var(--neon);box-shadow:0 0 6px var(--neon); }
+        .gmail-item.i .dot { background:#f72585;box-shadow:0 0 6px #f72585; }
+
+        .msg-center { text-align:center;padding:26px 0;color:var(--muted);font-size:0.82rem;letter-spacing:1px;line-height:1.7; }
+        .msg-center.loading { color:var(--neon);animation:blink 1.2s ease-in-out infinite; }
+    </style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<!-- Modal -->
+<div class="modal-bg" id="reportModal">
+    <div class="modal">
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <div class="modal-head">
+            <h3 id="mTitle" class="v">✅ Valid Gmails</h3>
+            <p class="modal-sub" id="mSub">Admin verified emails</p>
+        </div>
+        <div class="gmail-list" id="mList">
+            <div class="msg-center loading">⏳ Loading...</div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card">
+
+        <!-- Header -->
+        <div class="header-box">
+            <div class="badge">Buying Now</div>
+            <h2>Gmail Buyer</h2>
+            <p class="tagline">💎 Need Unlimited Fresh Gmail's Only</p>
+
+            <!-- Instructions -->
+            <div class="instructions">
+                <div class="inst-title">📋 Instructions</div>
+                <ul class="inst-list">
+                    <li><span class="step">1</span>Click <b>Check Status</b> → verify your Gmail on gmailver.com (Live only)</li>
+                    <li><span class="step">2</span>Take a screenshot of the verification result</li>
+                    <li><span class="step">3</span>Click <b>📸 Screenshot</b> → upload your screenshot proof</li>
+                    <li><span class="step">4</span>Paste your verified Gmail(s) below → click <b>Submit to Admin</b></li>
+                    <li><span class="step">5</span>Admin will review within 24 hours — check Valid/Invalid report</li>
+                </ul>
+            </div>
+
+            <!-- Password & Rate -->
+            <div class="pass-row">
+                <span class="label">Password</span>
+                <span class="value">aass1122</span>
+                <span class="sep">•</span>
+                <span class="label">Only Live Gmail</span>
+            </div>
+        </div>
+
+        <!-- Daily Rate -->
+        <div class="rate-box">
+            <div class="rate-item">
+                <div class="rate-num" id="rateDisplay">...</div>
+                <div class="rate-lbl">Per Valid Gmail</div>
+            </div>
+            <div class="rate-item">
+                <div class="rate-num">Unlimited</div>
+                <div class="rate-lbl">Daily Limit</div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-box">
+                <div class="stat-num" id="totalCount">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-box" id="validBox" onclick="openReport('valid')">
+                <div class="stat-num" id="validCount">0</div>
+                <div class="stat-label">Valid ✅</div>
+                <div class="tap-hint">👆 view</div>
+            </div>
+            <div class="stat-box" id="invalidBox" onclick="openReport('invalid')">
+                <div class="stat-num" id="invalidCount">0</div>
+                <div class="stat-label">Invalid ❌</div>
+                <div class="tap-hint">👆 view</div>
+            </div>
+        </div>
+
+        <div class="divider"><span class="divider-text">Submit Gmails</span></div>
+
+        <!-- Input -->
+        <div class="input-group">
+            <label>
+                <span class="lbl-icon">@</span>
+                Gmail Addresses
+            </label>
+            <textarea id="gmailInput" rows="6" placeholder="Paste Gmail addresses here...&#10;abc@gmail.com&#10;xyz@gmail.com&#10;test@gmail.com"></textarea>
+            <p class="input-hint">⬡ One Gmail per line — or separate with commas</p>
+        </div>
+
+        <!-- Buttons -->
+        <div class="btn-grid">
+            <button class="btn-check" onclick="window.open('https://www.gmailver.com/','_blank')">
+                🔍 Check Status
+            </button>
+            <button class="btn-screenshot" onclick="document.getElementById('ssInput').click()">
+                📸 Screenshot
+            </button>
+            <input type="file" id="ssInput" accept="image/*" style="display:none" onchange="uploadScreenshot(this)">
+            <button class="btn-submit btn-wide" onclick="submitGmails()">
+                📤 Submit to Admin
+            </button>
+        </div>
+
+        <!-- Upload Progress -->
+        <div class="upload-progress" id="uploadProgress">
+            <div class="upload-bar" id="uploadBar"></div>
+        </div>
+
+        <!-- Status -->
+        <div class="status-bar">
+            <div class="status-left">
+                <div class="status-dot"></div>
+                <span id="statusText">Ready — Only Fresh Live Gmails Accepted</span>
+            </div>
+            <div class="status-right">V 3.0</div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // ── Config ──────────────────────────────────────────────────
+    var GAS     = "https://script.google.com/macros/s/AKfycbx9mK-y5AnLJ8VpNI7yRr9TGfHnDYHIim5nnvntvQVkFzEQq9BP6KSB51X8hnrqdOkE/exec";
+    // freeimage.host - no account needed
+    var IMG_HOST = "https://freeimage.host/api/1/upload?key=6d207e02198a847aa98d0a2a901485a5&action=upload";
+    var UID     = "";
+
+    try {
+        var _u = JSON.parse(localStorage.getItem("psUser") || localStorage.getItem("ps_user") || "{}");
+        UID = _u.user_id || localStorage.getItem("psID") || "GUEST";
+    } catch(e) {}
+
+    window.addEventListener("load", function() { loadCounts(); loadSettings(); });
+
+    // ── Load rate from admin sheet ──────────────────────────────
+    function loadSettings() {
+        fetch(GAS.trim() + "?type=get_settings")
+            .then(function(r){ return r.json(); })
+            .then(function(d) {
+                if (d.status === "success" && d.settings) {
+                    var rate = d.settings.rate_per_gmail;
+                    if (rate !== undefined && rate !== "") {
+                        document.getElementById("rateDisplay").textContent = "Rs. " + rate;
+                    } else {
+                        document.getElementById("rateDisplay").textContent = "Rs. --";
+                    }
+                }
+            })
+            .catch(function(){
+                document.getElementById("rateDisplay").textContent = "Rs. --";
+            });
+    }
+
+    // ── Load valid/invalid counts ────────────────────────────────
+    function loadCounts() {
+        fetch(GAS.trim() + "?type=get_gmail_report&userId=" + encodeURIComponent(UID) + "&countOnly=true")
+            .then(function(r){ return r.json(); })
+            .then(function(d) {
+                if (d.status === "success") {
+                    var v = d.valid_count   || 0;
+                    var i = d.invalid_count || 0;
+                    document.getElementById("validCount").textContent   = v;
+                    document.getElementById("invalidCount").textContent = i;
+                    document.getElementById("totalCount").textContent   = v + i;
+                }
+            })
+            .catch(function(){});
+    }
+
+    // ── Submit Gmails ────────────────────────────────────────────
+    function submitGmails() {
+        var raw = document.getElementById("gmailInput").value.trim();
+        if (!raw) { setStatus("⚠️ Please enter Gmail addresses first"); return; }
+
+        var emails = raw.split(/[\n,]+/)
+            .map(function(e){ return e.trim().toLowerCase(); })
+            .filter(function(e){ return e.indexOf("@") > 0 && e.indexOf(".") > 0; });
+
+        if (!emails.length) { setStatus("⚠️ No valid email found"); return; }
+
+        setStatus("📤 Sending " + emails.length + " Gmail(s)...");
+
+        fetch(GAS.trim(), {
+            method : "POST",
+            mode   : "no-cors",
+            headers: { "Content-Type": "text/plain" },
+            body   : JSON.stringify({ action:"submit_gmail", user_id:UID, emails:emails })
+        })
+        .then(function() {
+            setStatus("✅ " + emails.length + " Gmail(s) submitted! Admin will review in 24 hours.");
+            document.getElementById("gmailInput").value = "";
+            setTimeout(loadCounts, 3000);
+        })
+        .catch(function(){ setStatus("❌ Network error. Please try again."); });
+    }
+
+    // ── Screenshot Upload via imgbb ──────────────────────────────
+    function uploadScreenshot(input) {
+        var file = input.files[0];
+        if (!file) return;
+        if (file.size > 8 * 1024 * 1024) { setStatus("⚠️ Image must be under 8MB"); return; }
+
+        setStatus("🔄 Uploading screenshot...");
+        showProgress(true);
+
+        // Compress image
+        var canvas = document.createElement("canvas");
+        var ctx    = canvas.getContext("2d");
+        var img    = new Image();
+        var url    = URL.createObjectURL(file);
+
+        img.onload = function() {
+            var maxW  = 1280;
+            var ratio = Math.min(1, maxW / img.width);
+            canvas.width  = Math.round(img.width  * ratio);
+            canvas.height = Math.round(img.height * ratio);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            URL.revokeObjectURL(url);
+
+            var base64 = canvas.toDataURL("image/jpeg", 0.75).split(",")[1];
+            animateProgress(30);
+
+            // Upload to freeimage.host (no account needed)
+            var fd = new FormData();
+            fd.append("source", base64);
+            fd.append("type", "base64");
+
+            fetch(IMG_HOST, { method:"POST", body:fd })
+                .then(function(r){ return r.json(); })
+                .then(function(d) {
+                    if (!d.image || !d.image.url) throw new Error("freeimage failed");
+                    var imgLink = d.image.url;
+                    animateProgress(80);
+
+                    // Save link to GAS sheet
+                    return fetch(GAS.trim(), {
+                        method : "POST",
+                        mode   : "no-cors",
+                        headers: { "Content-Type": "text/plain" },
+                        body   : JSON.stringify({
+                            action  : "upload_screenshot",
+                            user_id : UID,
+                            filename: "SS_" + UID + "_" + Date.now() + ".jpg",
+                            imgLink : imgLink
+                        })
+                    });
+                })
+                .then(function() {
+                    animateProgress(100);
+                    setTimeout(function(){ showProgress(false); }, 800);
+                    setStatus("✅ Screenshot uploaded! Admin can view it.");
+                    input.value = "";
+                })
+                .catch(function(err) {
+                    showProgress(false);
+                    setStatus("❌ Upload failed. Please try again.");
+                    console.error(err);
+                });
+        };
+        img.src = url;
+    }
+
+    function showProgress(show) {
+        var el = document.getElementById("uploadProgress");
+        if (show) { el.classList.add("show"); animateProgress(10); }
+        else       { el.classList.remove("show"); document.getElementById("uploadBar").style.width="0%"; }
+    }
+
+    function animateProgress(pct) {
+        document.getElementById("uploadBar").style.width = pct + "%";
+    }
+
+    // ── Report Modal ─────────────────────────────────────────────
+    function openReport(type) {
+        var modal = document.getElementById("reportModal");
+        var title = document.getElementById("mTitle");
+        var sub   = document.getElementById("mSub");
+        var list  = document.getElementById("mList");
+
+        if (type === "valid") {
+            title.textContent = "✅ Valid Gmails";
+            title.className   = "v";
+            sub.textContent   = "Admin has marked these emails as GOOD";
+        } else {
+            title.textContent = "❌ Invalid Gmails";
+            title.className   = "i";
+            sub.textContent   = "Admin has marked these emails as BAD";
+        }
+
+        list.innerHTML = '<div class="msg-center loading">⏳ Loading...</div>';
+        modal.classList.add("open");
+
+        fetch(GAS.trim() + "?type=get_gmail_report&userId=" + encodeURIComponent(UID) + "&filter=" + type)
+            .then(function(r){ return r.json(); })
+            .then(function(d) {
+                if (!d.emails || !d.emails.length) {
+                    list.innerHTML = '<div class="msg-center">No ' + type + ' emails yet.<br><small style="opacity:0.6">Admin reviews within 24 hours</small></div>';
+                    return;
+                }
+                var cls = type === "valid" ? "v" : "i";
+                list.innerHTML = d.emails.map(function(em){
+                    return '<div class="gmail-item ' + cls + '"><span class="dot"></span>' + em + '</div>';
+                }).join("");
+            })
+            .catch(function(){
+                list.innerHTML = '<div class="msg-center">❌ Failed to load. Try again.</div>';
+            });
+    }
+
+    function closeModal() { document.getElementById("reportModal").classList.remove("open"); }
+
+    document.getElementById("reportModal").addEventListener("click", function(e) {
+        if (e.target === this) closeModal();
+    });
+
+
+    // ── Fallback: send small base64 directly to GAS ──────────
+    function _uploadDirectToGas(base64, input) {
+        // Compress more aggressively for direct send
+        var canvas2 = document.createElement("canvas");
+        var ctx2    = canvas2.getContext("2d");
+        var img2    = new Image();
+        img2.onload = function() {
+            canvas2.width  = 600;
+            canvas2.height = Math.round(img2.height * 600 / img2.width);
+            ctx2.drawImage(img2, 0, 0, canvas2.width, canvas2.height);
+            var smallB64 = canvas2.toDataURL("image/jpeg", 0.5).split(",")[1];
+
+            fetch(GAS.trim(), {
+                method : "POST",
+                mode   : "no-cors",
+                headers: { "Content-Type": "text/plain" },
+                body   : JSON.stringify({
+                    action  : "upload_screenshot",
+                    user_id : UID,
+                    filename: "SS_" + UID + "_" + Date.now() + ".jpg",
+                    imgLink : "data:image/jpeg;base64," + smallB64.substring(0, 500) + "...(screenshot)",
+                    mimeType: "image/jpeg"
+                })
+            })
+            .then(function() {
+                setStatus("✅ Screenshot noted! (low-res backup saved)");
+                if (input) input.value = "";
+            })
+            .catch(function() {
+                setStatus("❌ All upload methods failed. Send screenshot on WhatsApp.");
+            });
+        };
+        img2.src = "data:image/jpeg;base64," + base64;
+    }
+
+        function setStatus(msg) { document.getElementById("statusText").textContent = msg; }
+</script>
+
+</body>
+</html>
